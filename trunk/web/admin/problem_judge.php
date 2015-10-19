@@ -3,6 +3,27 @@ if (!(isset($_SESSION['http_judge']))){
 	echo "0";
 	exit(1);
 }
+if(isset($_POST['manual'])){
+
+        $sid=intval($_POST['sid']);
+        $result=intval($_POST['result']);
+        if($result>=0){
+          $sql="UPDATE solution SET result=$result WHERE solution_id=$sid LIMIT 1";
+          mysql_query($sql);
+        }
+        if(isset($_POST['explain'])){
+             $sql="DELETE FROM runtimeinfo WHERE solution_id=$sid ";
+             mysql_query($sql);
+             $reinfo=mysql_real_escape_string($_POST['explain']);
+             if (get_magic_quotes_gpc ()) {
+                 $reinfo= stripslashes ( $reinfo);
+             }
+             $sql="INSERT INTO runtimeinfo VALUES($sid,'$reinfo')";
+             mysql_query($sql);
+        }
+        echo "<script>history.go(-1);</script>";
+}
+
 if(isset($_POST['update_solution'])){
 	//require_once("../include/check_post_key.php");
 	$sid=intval($_POST['sid']);
@@ -12,7 +33,8 @@ if(isset($_POST['update_solution'])){
 	$sim=intval($_POST['sim']);
 	$simid=intval($_POST['simid']);
 	$pass_rate=floatval($_POST['pass_rate']);
-	$sql="UPDATE solution SET result=$result,time=$time,memory=$memory,judgetime=NOW(),pass_rate=$pass_rate WHERE solution_id=$sid LIMIT 1";
+        $judger=mysql_real_escape_string($_SESSION['user_id']);
+	$sql="UPDATE solution SET result=$result,time=$time,memory=$memory,judgetime=NOW(),pass_rate=$pass_rate,judger='$judger' WHERE solution_id=$sid LIMIT 1";
 	echo $sql;
 	mysql_query($sql);
 	
@@ -177,6 +199,14 @@ if(isset($_POST['update_solution'])){
         }else{
           	echo file_get_contents($OJ_DATA.'/'.$file);
         }
+           
+}
+else if(isset($_POST['gettestdatadate'])){
+	$file=$_POST['filename'];
+        
+		
+    echo filemtime($OJ_DATA.'/'.$file);
+        
            
 }else{
 ?>

@@ -55,10 +55,10 @@ for ($i=0;$i<$pid_cnt;$i++){
 $rank=1;
 ?>
 <center><h3>Contest RankList -- <?php echo $title?></h3><a href="contestrank.xls.php?cid=<?php echo $cid?>" >Download</a></center>
-<table id=rank><thead><tr class=toprow align=center><td class="{sorter:'false'}" width=5%>Rank<th width=10%>User<th width=10%>Nick<th width=5%>Solved<th width=5%>Penalty
+  <table id=rank><thead><tr class=toprow align=center><td class="{sorter:'false'}" width=5%>Rank<th width=10%>User</th><th width=10%>Nick</th><th width=5%>Solved</th><th width=5%>Penalty</th>
 <?php
 for ($i=0;$i<$pid_cnt;$i++)
-	echo "<th class=\"{sorter:'punish'}\"><a href=problem.php?cid=$cid&pid=$i>$PID[$i]</a>";
+  echo "<td><a href=problem.php?cid=$cid&pid=$i>$PID[$i]</a></td>";
      echo "</tr></thead>\n<tbody>";
 for ($i=0;$i<$user_cnt;$i++){
 	if ($i&1) echo "<tr class=oddrow align=center>\n";
@@ -75,7 +75,7 @@ for ($i=0;$i<$user_cnt;$i++){
   if($uuid==$_GET['user_id']) echo "<td bgcolor=#ffff77>";
   else echo"<td>";
 	echo "<a name=\"$uuid\" href=userinfo.php?user=$uuid>$uuid</a>";
-	echo "<td><a href=userinfo.php?user=$uuid>".$U[$i]->nick."</a>";
+	 echo "<td><a href=userinfo.php?user=$uuid>".htmlentities($U[$i]->nick,ENT_QUOTES,"UTF-8")."</a>";
 	echo "<td><a href=status.php?user_id=$uuid&cid=$cid>$usolved</a>";
 	echo "<td>".sec2str($U[$i]->time);
 	for ($j=0;$j<$pid_cnt;$j++){

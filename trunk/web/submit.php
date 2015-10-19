@@ -1,7 +1,7 @@
 <?php session_start();
 if (!isset($_SESSION['user_id'])){
 	require_once("oj-header.php");
-	echo "<a href='loginpage.php'>Please Login First!</a>";
+	echo "<a href='loginpage.php'>$MSG_Login</a>";
 	require_once("oj-footer.php");
 	exit(0);
 }
@@ -9,7 +9,6 @@ require_once("include/db_info.inc.php");
 require_once("include/const.inc.php");
   $now=strftime("%Y-%m-%d %H:%M",time());
 $user_id=$_SESSION['user_id'];
-
 if (isset($_POST['cid'])){
 	$pid=intval($_POST['pid']);
 	$cid=intval($_POST['cid']);
@@ -27,7 +26,7 @@ if (isset($_POST['cid'])){
 //echo $sql;	
 
 $res=mysql_query($sql);
-if ($res&&mysql_num_rows($res)<1&&!isset($_SESSION['administrator'])&&!((isset($cid)&&$cid==0)||(isset($id)&&$id==0))){
+if ($res&&mysql_num_rows($res)<1&&!isset($_SESSION['administrator'])&&!((isset($cid)&&$cid<=0)||(isset($id)&&$id<=0))){
 		mysql_free_result($res);
 		$view_errors=  "Where do find this link? No such problem.<br>";
 		require("template/".$OJ_TEMPLATE."/error.php");
@@ -37,12 +36,15 @@ mysql_free_result($res);
 
 
 
+$test_run=false;
 if (isset($_POST['id'])) {
 	$id=intval($_POST['id']);
-	
+        $test_run=($id<=0);
 }else if (isset($_POST['pid']) && isset($_POST['cid'])&&$_POST['cid']!=0){
 	$pid=intval($_POST['pid']);
 	$cid=intval($_POST['cid']);
+        $test_run=($cid<0);
+	if($test_run) $cid=-$cid;
 	// check user if private
 	$sql="SELECT `private` FROM `contest` WHERE `contest_id`='$cid' AND `start_time`<='$now' AND `end_time`>'$now'";
 	$result=mysql_query($sql);
@@ -56,7 +58,7 @@ if (isset($_POST['id'])) {
 		$row=mysql_fetch_array($result);
 		$isprivate=intval($row[0]);
 		mysql_free_result($result);
-		if ($isprivate==1){
+		if ($isprivate==1&&!isset($_SESSION['c'.$cid])){
 			$sql="SELECT count(*) FROM `privilege` WHERE `user_id`='$user_id' AND `rightstr`='c$cid'";
 			$result=mysql_query($sql) or die (mysql_error()); 
 			$row=mysql_fetch_array($result);
@@ -80,6 +82,7 @@ if (isset($_POST['id'])) {
 	}else{
 		$row=mysql_fetch_object($result);
 		$id=intval($row->problem_id);
+		if($test_run) $id=-$id;
 		mysql_free_result($result);
 	}
 }else{
@@ -89,8 +92,8 @@ if (isset($_POST['id'])) {
 	require("template/".$OJ_TEMPLATE."/error.php");
 	exit(0);
 */
+       $test_run=true;
 }
-
 $language=intval($_POST['language']);
 if ($language>count($language_name) || $language<0) $language=0;
 $language=strval($language);
@@ -103,16 +106,23 @@ if(get_magic_quotes_gpc()){
 	$input_text=stripslashes($input_text);
 
 }
+$input_text=preg_replace ( "(\r\n)", "\n", $input_text );
 $source=mysql_real_escape_string($source);
 $input_text=mysql_real_escape_string($input_text);
-//$source=trim($source);
+$source_user=$source;
+if($test_run) $id=-$id;
 //use append Main code
+$prepend_file="$OJ_DATA/$id/prepend.$language_ext[$language]";
+if(isset($OJ_APPENDCODE)&&$OJ_APPENDCODE&&file_exists($prepend_file)){
+     $source=mysql_real_escape_string(file_get_contents($prepend_file)."\n").$source;
+}
 $append_file="$OJ_DATA/$id/append.$language_ext[$language]";
 if(isset($OJ_APPENDCODE)&&$OJ_APPENDCODE&&file_exists($append_file)){
      $source.=mysql_real_escape_string("\n".file_get_contents($append_file));
 }
 //end of append 
 
+if($test_run) $id=0;
 
 $len=strlen($source);
 //echo $source;
@@ -136,10 +146,10 @@ if ($len>65536){
 }
 
 // last submit
-$now=strftime("%Y-%m-%d %X",time()-10);
+$now=strftime("%Y-%m-%d %X",time()-1);
 $sql="SELECT `in_date` from `solution` where `user_id`='$user_id' and in_date>'$now' order by `in_date` desc limit 1";
 $res=mysql_query($sql);
-if (mysql_num_rows($res)==1){
+if (0&&mysql_num_rows($res)==1){
 	//$row=mysql_fetch_row($res);
 	//$last=strtotime($row[0]);
 	//$cur=time();
@@ -152,6 +162,8 @@ if (mysql_num_rows($res)==1){
 
 
 if((~$OJ_LANGMASK)&(1<<$language)){
+$store_id=0;
+if(isset($_SESSION['store_id'])) $store_id=$_SESSION['store_id'];
 
 	if (!isset($pid)){
 	$sql="INSERT INTO solution(problem_id,user_id,in_date,language,ip,code_length)
@@ -162,11 +174,13 @@ if((~$OJ_LANGMASK)&(1<<$language)){
 	}
 	mysql_query($sql);
 	$insert_id=mysql_insert_id();
+	$sql="INSERT INTO `source_code_user`(`solution_id`,`source`)VALUES('$insert_id','$source_user')";
+	mysql_query($sql);
 
 	$sql="INSERT INTO `source_code`(`solution_id`,`source`)VALUES('$insert_id','$source')";
 	mysql_query($sql);
 
-	if($id==0&&(!isset($cid)||$cid==0){
+	if($test_run){
 		$sql="INSERT INTO `custominput`(`solution_id`,`input_text`)VALUES('$insert_id','$input_text')";
 		mysql_query($sql);
 	}
@@ -207,7 +221,7 @@ if((~$OJ_LANGMASK)&(1<<$language)){
   if (isset($cid))
 	    $statusURI.="&cid=$cid";
 	 
-   if($id!=0||$cid!=0)	
+   if(!$test_run)	
 	header("Location: $statusURI");
    else{
 	?>

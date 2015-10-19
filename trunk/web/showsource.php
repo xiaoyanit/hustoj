@@ -23,8 +23,17 @@ $stime=$row->time;
 $smemory=$row->memory;
 $sproblem_id=$row->problem_id;
 $view_user_id=$suser_id=$row->user_id;
+$contest_id=$row->contest_id;
+
 mysql_free_result($result);
 
+if(isset($OJ_EXAM_CONTEST_ID)){
+	if($contest_id<$OJ_EXAM_CONTEST_ID&&!isset($_SESSION['source_browser'])){
+	header("Content-type: text/html; charset=utf-8");
+	 echo $MSG_SOURCE_NOT_ALLOWED_FOR_EXAM;
+	 exit();
+	}
+}
 
 if (isset($OJ_AUTO_SHARE)&&$OJ_AUTO_SHARE&&isset($_SESSION['user_id'])){
 	$sql="SELECT 1 FROM solution where 
@@ -37,7 +46,7 @@ $view_source="No source code available!";
 if (isset($_SESSION['user_id'])&&$row && $row->user_id==$_SESSION['user_id']) $ok=true;
 if (isset($_SESSION['source_browser'])) $ok=true;
 
-		$sql="SELECT `source` FROM `source_code` WHERE `solution_id`=".$id;
+		$sql="SELECT `source` FROM `source_code_user` WHERE `solution_id`=".$id;
 		$result=mysql_query($sql);
 		$row=mysql_fetch_object($result);
 		if($row)

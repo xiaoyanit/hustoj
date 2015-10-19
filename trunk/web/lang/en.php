@@ -33,7 +33,7 @@ $MSG_TEST_RUN="Test Running Done";
    
   $MSG_Runtime_Click="Runtime Error(Click)";
 	$MSG_Compile_Click="Compile Error(Click)";
-	 
+	$MSG_Click_Detail="Click To View Detail";
 	$MSG_Compile_OK="Compile OK";
 	$MSG_RUNID="RunID";
 	$MSG_USER="User";
@@ -44,6 +44,9 @@ $MSG_TEST_RUN="Test Running Done";
 	$MSG_LANG="Language";
 	$MSG_CODE_LENGTH="Code Length";
 	$MSG_SUBMIT_TIME="Submit Time";
+   $MSG_Manual="Manual Judge";
+   $MSG_OK="OK";
+   $MSG_Explain="Type reason or explaination";
 	//problemstatistics.php
 	$MSG_PD="PD";
 	$MSG_PR="PR";
@@ -121,5 +124,12 @@ $MSG_TEST_RUN="Test Running Done";
   $MSG_LeftTime="Left";
 
   $MSG_Ended="Finished";
+  
+  $MSG_Login="Please Login";
+  $MSG_JUDGER="Judger";
+  
+  $MSG_SOURCE_NOT_ALLOWED_FOR_EXAM="You can't browse early code during examing 。";
+  $MSG_BBS_NOT_ALLOWED_FOR_EXAM="You can't use bbs during examing 。";
+  $MSG_MAIL_NOT_ALLOWED_FOR_EXAM="You can't use mail during examing 。";
   
 ?>

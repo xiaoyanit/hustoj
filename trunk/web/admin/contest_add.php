@@ -1,16 +1,15 @@
-<?php require_once("admin-header.php");
-	if(isset($OJ_LANG)){
-		require_once("../lang/$OJ_LANG.php");
-	}
-?>
+<?php require_once("admin-header.php");?>
+<meta http-equiv="Content-Type" content="text/html; charset=utf8">
+<title>Add a contest</title>
 
 <?php
+	require_once("../include/db_info.inc.php");
 	require_once("../include/const.inc.php");
+
 $description="";
  if (isset($_POST['syear']))
 {
 	
-	require_once("../include/db_info.inc.php");
 	require_once("../include/check_post_key.php");
 	
 	$starttime=intval($_POST['syear'])."-".intval($_POST['smonth'])."-".intval($_POST['sday'])." ".intval($_POST['shour']).":".intval($_POST['sminute']).":00";
@@ -20,28 +19,32 @@ $description="";
 
         $title=$_POST['title'];
         $private=$_POST['private'];
+        $password=$_POST['password'];
         $description=$_POST['description'];
         if (get_magic_quotes_gpc ()){
                 $title = stripslashes ($title);
                 $private = stripslashes ($private);
+                $password = stripslashes ($password);
                 $description = stripslashes ($description);
         }
 
-	$title=mysql_real_escape_string($title);
-	$private=mysql_real_escape_string($private);
-	$description=mysql_real_escape_string($description);
-	
+        $title=mysql_real_escape_string($title);
+        $private=mysql_real_escape_string($private);
+        $password=mysql_real_escape_string($password);
+        $description=mysql_real_escape_string($description);
+
+
     $lang=$_POST['lang'];
     $langmask=0;
     foreach($lang as $t){
 			$langmask+=1<<$t;
 	} 
-	$langmask=1023&(~$langmask);
+$langmask=((1<<count($language_ext))-1)&(~$langmask);
 	//echo $langmask;	
 	
-	$sql="INSERT INTO `contest`(`title`,`start_time`,`end_time`,`private`,`langmask`,`description`)
-		VALUES('$title','$starttime','$endtime','$private',$langmask,'$description')";
-//	echo $sql;
+        $sql="INSERT INTO `contest`(`title`,`start_time`,`end_time`,`private`,`langmask`,`description`,`password`)
+                VALUES('$title','$starttime','$endtime','$private',$langmask,'$description','$password')";
+	echo $sql;
 	mysql_query($sql) or die(mysql_error());
 	$cid=mysql_insert_id();
 	echo "Add Contest ".$cid;
@@ -120,109 +123,62 @@ else if(isset($_POST['problem2contest'])){
 }  
   include_once("../fckeditor/fckeditor.php") ;
 ?>
-
-<html>
-	<head>
-		<title>OJ Administration</title>
-		<meta http-equiv="Pragma" content="no-cache">
-		<meta http-equiv="Cache-Control" content="no-cache">
-		<meta http-equiv="Content-Language" content="zh-cn">
-		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-		<link rel=stylesheet href='admin.css' type='text/css'>
-	</head>
-<body>
-
-
-
-<div class="container-fluid">
-	<?php require_once("admin-bar.php"); ?>
-	<div class="row-fluid top-space">
-		<div class="span2" >
-			<div class="menu-group"  >
-				<?php require_once("menu.php") ?>
-			</div>
-		</div>
-		<div class="span10">
-			<div class="marginTop">
-				<form method="POST"  class="add-contest-p">
-				<p><font style="font-size:22px;" color="#333399">Add a Contest</font></p>
-				<p><strong>Title:</strong><input class=input-xxlarge  type="text" name=title size=71 value="<?php echo isset($title)?$title:""?>"></p>
-				<p>Start Time:</p>
-				<p>
-					Year:<input  class="input-mini" type="text" name=syear value=<?php echo date('Y')?> size=4 >
-					Month:<input class="input-mini"  type="text" name=smonth value=<?php echo date('m')?> size=2 >
-					Day:<input class="input-mini" type="text" name=sday size=2 value=<?php echo date('d')?> >
-					Hour:<input class="input-mini"    type="text" name=shour size=2 value=<?php echo date('H')?>>
-					Minute:<input class="input-mini"    type="text" name=sminute value=00 size=2 >
-				</p>
-				<p>End Time:</p>
-				<p>
-					Year:<input class="input-mini"    type="text" name=eyear value=<?php echo date('Y')?> size=4 >
-					Month:<input class="input-mini"    type="text" name=emonth value=<?php echo date('m')?> size=2 >
-					Day:<input class="input-mini"  type="text" name=eday size=2 value=<?php echo date('d')+(date('H')+4>23?1:0)?>>
-					Hour:<input class="input-mini"  type="text" name=ehour size=2 value=<?php echo (date('H')+4)%24?>>
-					Minute:<input class="input-mini"  type="text" name=eminute value=00 size=2 >
-				</p>
-				<div class="row-fluid">
-					<div style="text-align:center;margin-left:auto;margin-right:auto">
-					<div align="right" class="span6" style="width:45%">
-						<p style="text-align:right;">Public:</p>
-						<select name=private>
-							<option value=0>Public</option>
-							<option value=1>Private</option>
-						</select>
-					<p style="text-align:right;">Language:</p><select name="lang[]" multiple="multiple"    style="height:220px">
-					<?php
-						$lang_count=count($language_ext);
-
-						 $langmask=$OJ_LANGMASK;
-
-						 for($i=0;$i<$lang_count;$i++){
-						    echo "<option value=$i selected>
-						        ".$language_name[$i]."
-						    </option>";
-						  }
-
-					?>
-
-
-				    </select>
-					</div>
-					<div class="span6" style="text-align:left;width:45%">
-						<p style="text-align:left;padding-left:3%;">Users:</p><textarea name="ulist" rows="20" cols="20"
-						title="*可以将学生学号从Excel整列复制过来，然后要求他们用学号做UserID注册,就能进入Private的比赛作为作业和测验。"></textarea>
-					</div>
-					</div>
-				</div>
-				<?php require_once("../include/set_post_key.php");?>
-				<div align="center">Problems:<input class=input-xxlarge type="text" size=60 name=cproblem value="<?php echo isset($plist)?$plist:""?>"></div>
-				<p align="center">Description:<br>
-
-				<?php
-					$fck_description = new FCKeditor('description') ;
-					$fck_description->BasePath = '../fckeditor/' ;
-					$fck_description->Height = 370 ;
-					$fck_description->Width=600;
-					$fck_description->Value = $description ;
-					$fck_description->Create() ;
-				?>
-				
-
-				<div class="align-center"></div>
-				<p class="btn-group" style="text-align:center;"><input class="btn" type="submit" value="Submit" name="submit"><input type="reset" class="btn" value="Reset" name="reset"></p>
-				</form>
-			<?php }
-
-			?>
-
-
-			</div>
-		</div>
-	</div>
-</div>
-
-</body>
-</html>
-
-
 	
+	<form method=POST >
+	<p align=center><font size=4 color=#333399>Add a Contest</font></p>
+	<p align=left>Title:<input class=input-xxlarge  type=text name=title size=71 value="<?php echo isset($title)?$title:""?>"></p>
+	<p align=left>Start Time:<br>&nbsp;&nbsp;&nbsp;
+	Year:<input  class=input-mini type=text name=syear value=<?php echo date('Y')?> size=4 >
+	Month:<input class=input-mini  type=text name=smonth value=<?php echo date('m')?> size=2 >
+	Day:<input class=input-mini type=text name=sday size=2 value=<?php echo date('d')?> >&nbsp;
+	Hour:<input class=input-mini    type=text name=shour size=2 value=<?php echo date('H')?>>&nbsp;
+	Minute:<input class=input-mini    type=text name=sminute value=00 size=2 ></p>
+	<p align=left>End Time:<br>&nbsp;&nbsp;&nbsp;
+	Year:<input class=input-mini    type=text name=eyear value=<?php echo date('Y')?> size=4 >
+	Month:<input class=input-mini    type=text name=emonth value=<?php echo date('m')?> size=2 >
+	
+	Day:<input class=input-mini  type=text name=eday size=2 value=<?php echo date('d')+(date('H')+4>23?1:0)?>>&nbsp;
+	Hour:<input class=input-mini  type=text name=ehour size=2 value=<?php echo (date('H')+4)%24?>>&nbsp;
+	Minute:<input class=input-mini  type=text name=eminute value=00 size=2 ></p>
+	Public:<select name=private><option value=0>Public</option><option value=1>Private</option></select>
+	Password:<input type=text name=password value="">
+	Language:<select name="lang[]" multiple="multiple"    style="height:220px">
+	<?php
+$lang_count=count($language_ext);
+
+ $langmask=$OJ_LANGMASK;
+
+ for($i=0;$i<$lang_count;$i++){
+                 echo "<option value=$i selected>
+                        ".$language_name[$i]."
+                 </option>";
+  }
+
+?>
+
+
+        </select>
+	<?php require_once("../include/set_post_key.php");?>
+	<br>Problems:<input class=input-xxlarge type=text size=60 name=cproblem value="<?php echo isset($plist)?$plist:""?>">
+	<br>
+	<p align=left>Description:<br><!--<textarea rows=13 name=description cols=80></textarea>-->
+
+<?php
+$fck_description = new FCKeditor('description') ;
+$fck_description->BasePath = '../fckeditor/' ;
+$fck_description->Height = 300 ;
+$fck_description->Width=600;
+$fck_description->Value = $description ;
+$fck_description->Create() ;
+
+?>
+	Users:<textarea name="ulist" rows="20" cols="20"></textarea>
+	<br />
+	*可以将学生学号从Excel整列复制过来，然后要求他们用学号做UserID注册,就能进入Private的比赛作为作业和测验。
+	<p><input type=submit value=Submit name=submit><input type=reset value=Reset name=reset></p>
+	</form>
+<?php }
+require_once("../oj-footer.php");
+
+?>
+

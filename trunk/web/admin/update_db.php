@@ -119,6 +119,14 @@ $csql[18]="";
 $tsql[18]="select 1 from custominput limit 1;";
 $csql[18]="CREATE TABLE  `custominput` (  `solution_id` int(11) NOT NULL DEFAULT '0',  `input_text` text,  PRIMARY KEY (`solution_id`)) ENGINE=MyISAM DEFAULT CHARSET=utf8;";
 
+$tsql[19]="ALTER TABLE `loginlog` ADD INDEX `user_time_index`(`user_id`, `time`);";
+$csql[19]="";
+$tsql[20]="select `password` from contest limit 1 ";
+$csql[20]="ALTER TABLE `contest` ADD `password` CHAR( 16 ) NOT NULL DEFAULT '' AFTER `langmask` ";
+$tsql[21]="select * from source_code_user limit 1 ";
+$csql[21]="create TABLE `source_code_user` like source_code ";
+$tsql[22]="select judger from solution limit 1 ";
+$csql[22]="ALTER TABLE `solution` ADD `judger` CHAR(16) NOT NULL DEFAULT 'LOCAL' ;  ";
 if(isset($_POST['do'])){
 	require_once("../include/check_post_key.php");
 	echo "Executing...<br>";
@@ -133,49 +141,16 @@ if(isset($_POST['do'])){
 	}
 }
 ?>
-
-
-<html>
-  <head>
-    <title>OJ Administration</title>
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Cache-Control" content="no-cache">
-    <meta http-equiv="Content-Language" content="zh-cn">
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <link rel=stylesheet href='admin.css' type='text/css'>
-  </head>
-<body>
-
-
-
-<div class="container-fluid">
-  <?php require_once("admin-bar.php"); ?>
-  <div class="row-fluid top-space">
-    <div class="span2" >
-      <div class="menu-group"  >
-        <?php require_once("menu.php") ?>
-      </div>
-    </div>
-    <div class="span10">
-      <div class="database col align-center">
-        <div class="news-header align-center">Update DataBase<hr/></div>
-          <div style="font-size:16px;">Create New Tables ,drop useless columes.</div>
-          <div style="font-size:16px;"><b>Necessary for using plagiarism detection.</b></div>
-
-          <form action='update_db.php' method=post>
-            <?php require_once("../include/set_post_key.php");?>
-            <input type='hidden' name='do' value='do'>
-            <input class="btn" type=submit value=Update>
-          </form>
-          
-        <?php if (file_exists("update_pw.php")) { ?>
-           <a href="update_pw.php">Upgrade all users password storage form to get more security.</a>
-           * only do once !
-        <?php }?>
-      </div>
-    </div>
-  </div>
-</div>
-
-</body>
-</html>
+<b>Update DataBase</b>
+	Create New Tables ,drop useless columes.
+	<b>Necessary for using plagiarism detection.</b>
+	<form action='update_db.php' method=post>
+		<?php require_once("../include/set_post_key.php");?>
+		<input type='hidden' name='do' value='do'>
+		<input type=submit value=Update>
+	</form>
+	
+<?php if (file_exists("update_pw.php")) {	?>
+   <a href="update_pw.php">Upgrade all users password storage form to get more security.</a>
+   * only do once !
+<?php }?>

@@ -18,6 +18,7 @@ CREATE TABLE  `contest` (
   `description` text,
   `private` tinyint(4) NOT NULL DEFAULT '0',
   `langmask` int NOT NULL DEFAULT '0' COMMENT 'bits for LANG to mask',
+  `password` CHAR( 16 ) NOT NULL DEFAULT '',
   PRIMARY KEY (`contest_id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=1000 DEFAULT CHARSET=utf8;
 
@@ -29,11 +30,12 @@ CREATE TABLE  `contest_problem` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 
-CREATE TABLE  `loginlog` (
+CREATE TABLE `loginlog` (
   `user_id` varchar(48) NOT NULL DEFAULT '',
   `password` varchar(40) DEFAULT NULL,
   `ip` varchar(100) DEFAULT NULL,
-  `time` datetime DEFAULT NULL
+  `time` datetime DEFAULT NULL,
+  KEY `user_log_index` (`user_id`,`time`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 CREATE TABLE  `mail` (
@@ -124,8 +126,9 @@ CREATE TABLE  `solution` (
   `valid` tinyint(4) NOT NULL DEFAULT '1',
   `num` tinyint(4) NOT NULL DEFAULT '-1',
   `code_length` int(11) NOT NULL DEFAULT '0',
-  `judgetime` datetime DEFAULT NULL,
+  `judgetime` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `pass_rate` DECIMAL(2,2) UNSIGNED NOT NULL DEFAULT 0,
+  `lint_error` int UNSIGNED NOT NULL DEFAULT 0,
   PRIMARY KEY (`solution_id`),
   KEY `uid` (`user_id`),
   KEY `pid` (`problem_id`),
@@ -138,6 +141,7 @@ CREATE TABLE  `source_code` (
   `source` text NOT NULL,
   PRIMARY KEY (`solution_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+create table source_code_user like source_code;
 
 CREATE TABLE  `topic` (
   `tid` int(11) NOT NULL AUTO_INCREMENT,

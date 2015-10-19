@@ -1,1 +1,1 @@
-<a href=submitpage.php?id=0&sid=1016>IDE测试</a>
+系统演示中，各语言支持不保证完整。Swift OC 判题MacOS测试中，暂未开源。

@@ -31,7 +31,7 @@
 	if(isset($OJ_LANG)){
 		require_once("../lang/$OJ_LANG.php");
 		if(file_exists("../faqs.$OJ_LANG.php")){
-			$OJ_FAQ_LINK="../faqs.$OJ_LANG.php";
+			$OJ_FAQ_LINK="faqs.$OJ_LANG.php";
 		}
 	}else{
 		require_once("../lang/en.php");
@@ -47,7 +47,7 @@
 <body>
 <div id="wrapper">
 <div id=head>
-<h2><img id=logo src=../image/logo.png><font color="red">Welcome To <?php echo $OJ_NAME?> ACM-ICPC Online Judge</font></h2>
+<h2><img id=logo src=../image/logo.png><font color="red"> <?php echo $OJ_NAME?> </font></h2>
 </div><!--end head-->
 <div id=subhead> 
 <div id=menu class=navbar>

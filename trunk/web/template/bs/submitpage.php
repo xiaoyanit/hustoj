@@ -42,9 +42,10 @@ editAreaLoader.init({
         });
 </script>
 <?php }?>
-<script src="include/checksource.js">
+<script src="include/checksource.js"></script>
+<script src="include/jquery-latest.js"></script>
 
-</script>
+
 <form id=frmSolution action="submit.php" method="post"
 <?php if($OJ_LANG=="cn"){?>
  onsubmit="return checksource(document.getElementById('source').value);"
@@ -54,10 +55,10 @@ editAreaLoader.init({
 Problem <span class=blue><b><?php echo $id?></b></span>
 <input id=problem_id type='hidden'  value='<?php echo $id?>' name="id" ><br>
 <?php }else{
-$PID="ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-if ($pid>25) $pid=25;
+//$PID="ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+//if ($pid>25) $pid=25;
 ?>
-Problem <span class=blue><b><?php echo $PID[$pid]?></b></span> of Contest <span class=blue><b><?php echo $cid?></b></span><br>
+Problem <span class=blue><b><?php echo chr($pid+ord('A'))?></b></span> of Contest <span class=blue><b><?php echo $cid?></b></span><br>
 <input id="cid" type='hidden' value='<?php echo $cid?>' name="cid">
 <input id="pid" type='hidden' value='<?php echo $pid?>' name="pid">
 <?php }?>
@@ -113,26 +114,8 @@ if(isset($_COOKIE['lastlang'])) $lastlang=$_COOKIE['lastlang'];
 function print_result(solution_id)
 {
 sid=solution_id;
-var xmlhttp;
-if (window.XMLHttpRequest)
-  {// code for IE7+, Firefox, Chrome, Opera, Safari
-  xmlhttp=new XMLHttpRequest();
-  }
-else
-  {// code for IE6, IE5
-  xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
-  }
-xmlhttp.onreadystatechange=function()
-  {
-  if (xmlhttp.readyState==4 && xmlhttp.status==200)
-    {
-     var tb=window.document.getElementById('out');
-     var r=xmlhttp.responseText;
-     tb.innerHTML=""+r;
-    }
-  }
-xmlhttp.open("GET","status-ajax.php?tr=1&solution_id="+solution_id,true);
-xmlhttp.send();
+$("#out").load("status-ajax.php?tr=1&solution_id="+solution_id);
+
 }
 
 function fresh_result(solution_id)
@@ -191,7 +174,7 @@ function getSID(){
 }
 
 var count=0;
-     function do_submit(){
+function do_submit(){
 
 if(typeof(eAL) != "undefined"){   eAL.toggle("source");eAL.toggle("source");}
 
@@ -205,9 +188,12 @@ if(typeof(eAL) != "undefined"){   eAL.toggle("source");eAL.toggle("source");}
                 problem_id.value='<?php echo $cid?>';
        
         document.getElementById("frmSolution").target="_self";
+        <?php if($OJ_LANG=="cn") echo "if(checksource(document.getElementById('source').value))";?>
         document.getElementById("frmSolution").submit();
      }
-     function do_test_run(){
+     var  handler_interval;
+function do_test_run(){ 
+     if( handler_interval) window.clearInterval( handler_interval);
           var loader="<img width=18 src=image/loader.gif>";
           var tb=window.document.getElementById('result');
           tb.innerHTML=loader;
@@ -222,9 +208,9 @@ if(typeof(eAL) != "undefined"){   eAL.toggle("source");eAL.toggle("source");}
         document.getElementById("TestRun").disabled=true;
         document.getElementById("Submit").disabled=true;
         count=20;
-        window.setTimeout("resume();",1000);
+         handler_interval= window.setTimeout("resume();",1000);
        
-     }
+}
      
   function resume(){
   	count--;
@@ -235,7 +221,7 @@ if(typeof(eAL) != "undefined"){   eAL.toggle("source");eAL.toggle("source");}
   		t.disabled=false; 
                 s.value="<?php echo $MSG_SUBMIT?>";
         	t.value="<?php echo $MSG_TR?>";
-                window.cleanTimeout();
+                if( handler_interval) window.clearInterval( handler_interval);
         }else{
         	s.value="<?php echo $MSG_SUBMIT?>("+count+")";
         	t.value="<?php echo $MSG_TR?>("+count+")";

@@ -11,7 +11,7 @@ static 	$OJ_ADMIN="root@localhost";
 static 	$OJ_DATA="/home/judge/data";
 static 	$OJ_BBS="discuss";//"bbs" for phpBB3 bridge or "discuss" for mini-forum
 static  $OJ_ONLINE=false;
-static  $OJ_LANG="en";
+static  $OJ_LANG="cn";
 static  $OJ_SIM=true; 
 static  $OJ_DICT=true;
 static  $OJ_LANGMASK=4080; //1mC 2mCPP 4mPascal 8mJava 16mRuby 32mBash 1008 for security reason to mask all other language
@@ -26,10 +26,15 @@ static  $OJ_MEMSERVER="127.0.0.1";
 static  $OJ_MEMPORT=11211;
 static  $SAE_STORAGE_ROOT="http://hustoj-web.stor.sinaapp.com/";
 static  $OJ_TEMPLATE="bs";
+if(isset($_GET['tp'])) $OJ_TEMPLATE=$_GET['tp'];
 static  $OJ_LOGIN_MOD="hustoj";
 static  $OJ_RANK_LOCK_PERCENT=0;
 static  $OJ_SHOW_DIFF=false;
 static  $OJ_TEST_RUN=true;
+static  $OJ_EXAM_CONTEST_ID=0;
+
+
+
 static $OJ_OPENID_PWD = '8a367fe87b1e406ea8e94d7d508dcf01';
 
 /* weibo config here */

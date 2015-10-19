@@ -2,7 +2,7 @@
  $cache_time=10; 
  $OJ_CACHE_SHARE=false;
 	require_once('./include/cache_start.php');
-        require_once('./include/db_info.inc.php');
+    require_once('./include/db_info.inc.php');
 	require_once('./include/setlang.php');
 	require_once("./include/const.inc.php");
 	require_once("./include/my_func.inc.php");
@@ -25,7 +25,7 @@ if ($row_cnt==0){
 
 $row=mysql_fetch_object($result);
 $school=$row->school;
-$email="MASKED@MASKED.COM";//$row->email;
+$email=$row->email;
 $nick=$row->nick;
 mysql_free_result($result);
 // count solved
@@ -63,6 +63,7 @@ mysql_free_result($result);
 $sql="SELECT result,count(1) FROM solution WHERE `user_id`='$user_mysql'  AND result>=4 group by result order by result";
 	$result=mysql_query($sql);
 	$view_userstat=array();
+	$i=0;
 	while($row=mysql_fetch_array($result)){
 		$view_userstat[$i++]=$row;
 	}
